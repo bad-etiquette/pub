@@ -1,0 +1,1162 @@
+"""
+Скрипт автоматизации 
+"""
+
+import time
+import random
+import logging
+import threading
+import signal
+import sys
+from datetime import datetime, timedelta
+from enum import Enum
+from dataclasses import dataclass
+from typing import Optional, List, Dict, Any, Tuple, Union, Callable
+from pynput import mouse, keyboard
+from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Key, Controller as KeyboardController, Listener as KeyboardListener
+
+import math  # 
+import statistics  # 
+import itertools  # 
+import fractions  # 
+from collections import OrderedDict, Counter, deque  # Частично не используются
+import hashlib  # 
+import base64  # 
+import json  # 
+import csv  # 
+
+class UnusedCalculator:
+    
+    def __init__(self):
+        self._cache = {}
+        self._history = []
+        self._version = "1.0.0"
+    
+    def add_numbers(self, a: float, b: float) -> float:
+        result = a + b
+        self._history.append(f"add({a}, {b}) = {result}")
+        self._cache[f"{a}+{b}"] = result
+        return result
+    
+    def unused_method_1(self):
+        numbers = [random.random() for _ in range(100)]
+        mean = sum(numbers) / len(numbers)
+        variance = sum((x - mean) ** 2 for x in numbers) / len(numbers)
+        return math.sqrt(variance)
+    
+    def unused_method_2(self):
+        for i in range(1000):
+            if i % 2 == 0:
+                yield i ** 2
+    
+    def _private_helper(self):
+        pass
+
+def unused_utility_function_1():
+    data = [random.randint(1, 100) for _ in range(50)]
+    sorted_data = sorted(data, reverse=True)
+    filtered = [x for x in sorted_data if x > 50]
+    return sum(filtered) / len(filtered) if filtered else 0
+
+def unused_utility_function_2(limit: int = 100):
+    primes = []
+    for num in range(2, limit + 1):
+        is_prime = True
+        for i in range(2, int(math.sqrt(num)) + 1):
+            if num % i == 0:
+                is_prime = False
+                break
+        if is_prime:
+            primes.append(num)
+    return primes
+
+def complex_unused_algorithm(matrix_size: int = 10):
+    matrix = [[random.random() for _ in range(matrix_size)] 
+              for _ in range(matrix_size)]
+    
+    transposed = [[matrix[j][i] for j in range(matrix_size)] 
+                  for i in range(matrix_size)]
+    
+    result = [[0 for _ in range(matrix_size)] 
+              for _ in range(matrix_size)]
+    
+    for i in range(matrix_size):
+        for j in range(matrix_size):
+            for k in range(matrix_size):
+                result[i][j] += matrix[i][k] * transposed[k][j]
+    
+    return result
+
+UNUSED_CONSTANT_1 = 3.141592653589793
+UNUSED_CONSTANT_2 = "THIS_IS_NOT_USED_ANYWHERE"
+UNUSED_CONSTANT_3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+UNUSED_CONSTANT_4 = {"key1": "value1", "key2": "value2", "key3": "value3"}
+UNUSED_CONSTANT_5 = (True, False, None)
+
+GLOBAL_CACHE = {}
+
+def timing_decorator(func):
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        elapsed = end_time - start_time
+        if elapsed > 1.0:  # Логируем только долгие операции
+            print(f"{func.__name__} выполнена за {elapsed:.4f} секунд")
+        return result
+    return wrapper
+
+def log_calls_decorator(func):
+    call_count = 0
+    
+    def wrapper(*args, **kwargs):
+        nonlocal call_count
+        call_count += 1
+        print(f"Вызов #{call_count} функции {func.__name__}")
+        return func(*args, **kwargs)
+    
+    wrapper.get_call_count = lambda: call_count
+    return wrapper
+
+class Config:
+    """Конфигурация скрипта"""
+    WORK_START_HOUR = 8
+    WORK_END_HOUR = 17
+    LUNCH_START_HOUR = 13
+    LUNCH_DURATION_MINUTES = 60
+    MIN_ACTIVITY_INTERVAL = 30  # секунды
+    MAX_ACTIVITY_INTERVAL = 120  # секунды
+    ACTIVITY_CHANCES = {
+        'mouse_move': 0.3,
+        'mouse_click': 0.2,
+        'keyboard_type': 0.25,
+        'app_switch': 0.15,
+        'scroll': 0.1
+    }
+    TYPING_SENTENCES = [
+        "stages:",
+        "- deploy",
+        "- qa",
+        "deploy_job:",
+        "stage: deploy",
+        "script:",
+        "- echo 'Deploying application...'",
+        "smoke_test_job:",
+        "stage: qa",
+        "image: your_test_runner_image # e.g., an image with curl or your test framework installed",
+        "script:",
+        "- ./run-smoke-tests.sh # A script that executes your specific smoke test commands (e.g., curl health endpoints)",
+        "Optional: only run this job for specific branches or after successful deployment"
+    ]
+    
+
+    UNUSED_CONFIG_1 = "default_value"
+    UNUSED_CONFIG_2 = 100
+    UNUSED_CONFIG_3 = ["item1", "item2", "item3"]
+
+
+class LoggerMixin:
+    def __init__(self):
+        self._log_buffer = []
+        self._max_buffer_size = 1000
+    
+    def _add_to_log(self, message: str):
+        self._log_buffer.append(f"{datetime.now()}: {message}")
+        if len(self._log_buffer) > self._max_buffer_size:
+            self._log_buffer.pop(0)
+    
+    def _clear_log_buffer(self):
+        self._log_buffer.clear()
+    
+    def _get_log_stats(self):
+        if not self._log_buffer:
+            return {"count": 0, "avg_length": 0}
+        
+        lengths = [len(msg) for msg in self._log_buffer]
+        return {
+            "count": len(self._log_buffer),
+            "avg_length": sum(lengths) / len(lengths),
+            "min_length": min(lengths),
+            "max_length": max(lengths)
+        }
+
+# ==================== ЛОГГИНГ ====================
+def setup_logging():
+    """Настройка системы логирования"""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(f'activity_simulation_{datetime.now().strftime("%Y%m%d_%H%M%S")}.log'),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+    return logging.getLogger(__name__)
+
+def unused_logging_function(message: str, level: str = "INFO"):
+    levels = {"DEBUG": 0, "INFO": 1, "WARNING": 2, "ERROR": 3, "CRITICAL": 4}
+    level_num = levels.get(level.upper(), 1)
+    
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+    formatted = f"[{timestamp}] [{level:8}] {message}"
+    
+    if level_num >= 3:  # ERROR и выше
+        with open("errors.log", "a") as f:
+            f.write(formatted + "\n")
+    
+    return formatted
+
+# ==================== МОДЕЛИ ДАННЫХ ====================
+class ActivityType(Enum):
+    MOUSE_MOVE = "mouse_move"
+    MOUSE_CLICK = "mouse_click"
+    KEYBOARD_TYPE = "keyboard_type"
+    APP_SWITCH = "app_switch"
+    SCROLL = "scroll"
+    IDLE = "idle"
+
+@dataclass
+class ActivityRecord:
+    """Запись хода скрипта"""
+    timestamp: datetime
+    activity_type: ActivityType
+    details: dict
+    duration: float
+
+class EnhancedActivityRecord(ActivityRecord):
+    """Расширенная запись ()"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._hash = None
+        self._serialized = None
+    
+    def calculate_hash(self):
+        """Вычисляет хэш записи ()"""
+        if self._hash is None:
+            data = f"{self.timestamp}{self.activity_type}{self.details}{self.duration}"
+            self._hash = hashlib.md5(data.encode()).hexdigest()
+        return self._hash
+    
+    def to_json(self):
+        """Конвертирует в JSON ()"""
+        if self._serialized is None:
+            self._serialized = json.dumps({
+                "timestamp": self.timestamp.isoformat(),
+                "activity_type": self.activity_type.value,
+                "details": self.details,
+                "duration": self.duration
+            })
+        return self._serialized
+
+# ==================== КЛАСС СКРИПТА ====================
+class ActivityEmulator:
+    """Основной класс"""
+    
+    def __init__(self):
+        self.logger = setup_logging()
+        self.mouse_controller = MouseController()
+        self.keyboard_controller = KeyboardController()
+        self.running = False
+        self.paused = False
+        self.activities_log = []
+        self.start_time = None
+        
+        self.current_mouse_pos = (0, 0)
+        
+        # Статистика
+        self.stats = {
+            ActivityType.MOUSE_MOVE: 0,
+            ActivityType.MOUSE_CLICK: 0,
+            ActivityType.KEYBOARD_TYPE: 0,
+            ActivityType.APP_SWITCH: 0,
+            ActivityType.SCROLL: 0,
+            ActivityType.IDLE: 0
+        }
+        
+        self._unused_list = []
+        self._unused_dict = {}
+        self._unused_counter = 0
+        self._initialize_junk_data()
+        
+        self.logger.info("Скрипт инициализирован")
+    
+    def _initialize_junk_data(self):
+
+        for i in range(100):
+            self._unused_list.append(i ** 2)
+            self._unused_dict[f"key_{i}"] = f"value_{i}"
+        
+        self._unused_calculator = UnusedCalculator()
+        
+        for i in range(10):
+            temp = math.sin(i) * math.cos(i)
+            self._unused_list.append(temp)
+    
+    def _unused_helper_method_1(self, data: List[float]) -> float:
+        if not data:
+            return 0.0
+        
+        sorted_data = sorted(data)
+        n = len(sorted_data)
+        
+        if n % 2 == 0:
+            median = (sorted_data[n//2 - 1] + sorted_data[n//2]) / 2
+        else:
+            median = sorted_data[n//2]
+        
+        mean = sum(data) / n
+        variance = sum((x - mean) ** 2 for x in data) / n
+        
+        return median * variance
+    
+    def _unused_helper_method_2(self):
+        result = []
+        for i in range(1, 101):
+            if i % 3 == 0 and i % 5 == 0:
+                result.append("FizzBuzz")
+            elif i % 3 == 0:
+                result.append("Fizz")
+            elif i % 5 == 0:
+                result.append("Buzz")
+            else:
+                result.append(str(i))
+        
+        grouped = {}
+        for item in result:
+            key = len(item)
+            if key not in grouped:
+                grouped[key] = []
+            grouped[key].append(item)
+        
+        return grouped
+    
+    @timing_decorator
+    def _slow_unused_method(self):
+        time.sleep(0.1)
+        numbers = [random.random() for _ in range(10000)]
+        
+        total = 0
+        for i in range(len(numbers)):
+            for j in range(i + 1, len(numbers)):
+                total += numbers[i] * numbers[j]
+        
+        return total
+    
+    def _log_activity(self, activity_type: ActivityType, details: dict, duration: float = 0.0):
+        """Логирование"""
+        record = ActivityRecord(
+            timestamp=datetime.now(),
+            activity_type=activity_type,
+            details=details,
+            duration=duration
+        )
+        self.activities_log.append(record)
+        self.stats[activity_type] += 1
+        
+        if duration > 3600:
+            self._log_unusual_activity(record)
+        
+        self.logger.info(f"{activity_type.value}: {details}")
+    
+    def _log_unusual_activity(self, record: ActivityRecord):
+        unusual_data = {
+            "timestamp": record.timestamp,
+            "type": record.activity_type.value,
+            "duration": record.duration,
+            "is_unusual": True
+        }
+        
+        with open("unusual_activities.log", "a") as f:
+            json.dump(unusual_data, f)
+            f.write("\n")
+    
+    def _get_screen_size(self):
+        try:
+            from screeninfo import get_monitors
+            monitor = get_monitors()[0]
+            
+            diagonal = math.sqrt(monitor.width ** 2 + monitor.height ** 2)
+            aspect_ratio = monitor.width / monitor.height
+            
+            GLOBAL_CACHE["screen_diagonal"] = diagonal
+            GLOBAL_CACHE["screen_aspect_ratio"] = aspect_ratio
+            
+            return monitor.width, monitor.height
+        except:
+            return 1920, 1080
+    
+    def _random_mouse_position(self):
+        width, height = self._get_screen_size()
+        
+        zone = random.choices(
+            ["center", "edges", "corners"],
+            weights=[0.7, 0.2, 0.1]
+        )[0]
+        
+        if zone == "center":
+            x = random.randint(width // 4, 3 * width // 4)
+            y = random.randint(height // 4, 3 * height // 4)
+        elif zone == "edges":
+            if random.random() > 0.5:
+                x = random.choice([50, width - 50])
+                y = random.randint(50, height - 50)
+            else:
+                x = random.randint(50, width - 50)
+                y = random.choice([50, height - 50])
+        else:  # corners
+            corner = random.choice([
+                (50, 50),
+                (width - 50, 50),
+                (50, height - 50),
+                (width - 50, height - 50)
+            ])
+            x, y = corner
+        
+        noise_x = random.randint(-10, 10)
+        noise_y = random.randint(-10, 10)
+        
+        return (
+            max(0, min(width, x + noise_x)),
+            max(0, min(height, y + noise_y))
+        )
+    
+    def emulate_mouse_move(self):
+        start_time = time.time()
+        
+        target_x, target_y = self._random_mouse_position()
+        
+        steps = random.randint(10, 30)
+        current_x, current_y = self.mouse_controller.position
+        
+        path_length = 0
+        previous_x, previous_y = current_x, current_y
+        
+        for i in range(steps):
+            if not self.running or self.paused:
+                return
+            
+            progress = i / steps
+            x = current_x + (target_x - current_x) * progress
+            y = current_y + (target_y - current_y) * progress
+            
+            jitter_x = random.randint(-3, 3)
+            jitter_y = random.randint(-3, 3)
+            
+            final_x = x + jitter_x
+            final_y = y + jitter_y
+            
+            dx = final_x - previous_x
+            dy = final_y - previous_y
+            path_length += math.sqrt(dx * dx + dy * dy)
+            previous_x, previous_y = final_x, final_y
+            
+            self.mouse_controller.position = (int(final_x), int(final_y))
+            
+            time.sleep(random.uniform(0.01, 0.05))
+        
+        self.current_mouse_pos = (target_x, target_y)
+        duration = time.time() - start_time
+        
+        if path_length > 0:
+            GLOBAL_CACHE["last_mouse_path_length"] = path_length
+        
+        self._log_activity(
+            ActivityType.MOUSE_MOVE,
+            {"from": (current_x, current_y), "to": (target_x, target_y), "path_length": path_length},
+            duration
+        )
+    
+    def emulate_mouse_click(self):
+        start_time = time.time()
+        
+        click_type = random.choice(['left', 'right', 'double', 'middle'])
+        
+        button_map = {
+            'left': Button.left,
+            'right': Button.right,
+            'middle': Button.middle
+        }
+        
+        button = button_map.get(click_type, Button.left)
+        
+        time.sleep(random.uniform(0.1, 0.3))
+        
+        if click_type == 'double':
+            self.mouse_controller.click(button, 2)
+        else:
+            self.mouse_controller.click(button)
+        
+        duration = time.time() - start_time
+        
+        if duration > 1.0:
+            self._log_unusual_click(duration, click_type)
+        
+        self._log_activity(
+            ActivityType.MOUSE_CLICK,
+            {"button": click_type, "position": self.mouse_controller.position},
+            duration
+        )
+    
+    def _log_unusual_click(self, duration: float, click_type: str):
+        data = {
+            "timestamp": time.time(),
+            "duration": duration,
+            "type": click_type,
+            "position": self.mouse_controller.position
+        }
+        
+        encoded = base64.b64encode(json.dumps(data).encode()).decode()
+        
+        with open("unusual_clicks.b64", "a") as f:
+            f.write(encoded + "\n")
+    
+    def emulate_keyboard_typing(self):
+        start_time = time.time()
+        
+        text = random.choice(Config.TYPING_SENTENCES)
+        
+        if random.random() > 0.5:
+            words = text.split()
+            if len(words) > 3:
+                start_idx = random.randint(0, len(words) - 3)
+                end_idx = random.randint(start_idx + 2, len(words))
+                text = ' '.join(words[start_idx:end_idx])
+        
+        char_count = 0
+        error_count = 0
+        
+        for char in text:
+            if not self.running or self.paused:
+                return
+            
+            char_type = "letter" if char.isalpha() else "digit" if char.isdigit() else "symbol"
+            
+            self.keyboard_controller.type(char)
+            char_count += 1
+            
+            
+            if char_type == "letter":
+                delay = random.uniform(0.05, 0.15)
+            elif char_type == "digit":
+                delay = random.uniform(0.1, 0.2)
+            else:
+                delay = random.uniform(0.2, 0.3)
+            
+            time.sleep(delay)
+            
+            
+            if random.random() < 0.02:
+                error_count += 1
+                time.sleep(random.uniform(0.1, 0.3))
+                self.keyboard_controller.press(Key.backspace)
+                self.keyboard_controller.release(Key.backspace)
+                time.sleep(random.uniform(0.1, 0.3))
+                self.keyboard_controller.type(char)
+        
+        duration = time.time() - start_time
+        
+        
+        typing_speed = char_count / duration if duration > 0 else 0
+        error_rate = error_count / char_count if char_count > 0 else 0
+        
+        self._log_activity(
+            ActivityType.KEYBOARD_TYPE,
+            {
+                "text_length": len(text),
+                "char_count": char_count,
+                "error_count": error_count,
+                "typing_speed": typing_speed,
+                "error_rate": error_rate,
+                "text_sample": text[:50] + "..." if len(text) > 50 else text
+            },
+            duration
+        )
+    
+    def emulate_app_switch(self):
+        
+        start_time = time.time()
+        
+        
+        with self.keyboard_controller.pressed(Key.alt):
+            self.keyboard_controller.press(Key.tab)
+            time.sleep(random.uniform(0.1, 0.3))
+            self.keyboard_controller.release(Key.tab)
+        
+        
+        tab_presses = random.randint(1, 5)
+        for i in range(tab_presses):
+            if not self.running or self.paused:
+                return
+            
+            
+            if i % 2 == 0:
+                delay = random.uniform(0.1, 0.2)
+            else:
+                delay = random.uniform(0.2, 0.3)
+            
+            time.sleep(delay)
+            self.keyboard_controller.press(Key.tab)
+            self.keyboard_controller.release(Key.tab)
+        
+        
+        time.sleep(random.uniform(0.5, 1.0))
+        self.keyboard_controller.press(Key.enter)
+        self.keyboard_controller.release(Key.enter)
+        
+        duration = time.time() - start_time
+        
+        self._log_activity(
+            ActivityType.APP_SWITCH,
+            {"tab_presses": tab_presses, "duration_per_tab": duration / tab_presses if tab_presses > 0 else 0},
+            duration
+        )
+    
+    def emulate_scroll(self):
+        
+        start_time = time.time()
+        
+        
+        direction = random.choice([-1, 1])
+        scroll_amount = random.randint(1, 5)
+        
+        
+        total_scroll = 0
+        
+        for i in range(scroll_amount):
+            if not self.running or self.paused:
+                return
+            
+            
+            speed_factor = 1.0 + math.sin(i) * 0.5
+            
+            self.mouse_controller.scroll(0, direction * speed_factor)
+            total_scroll += direction * speed_factor
+            
+            time.sleep(random.uniform(0.05, 0.2))
+        
+        duration = time.time() - start_time
+        
+        
+        scroll_key = f"scroll_{'up' if direction > 0 else 'down'}"
+        if scroll_key not in GLOBAL_CACHE:
+            GLOBAL_CACHE[scroll_key] = 0
+        GLOBAL_CACHE[scroll_key] += total_scroll
+        
+        self._log_activity(
+            ActivityType.SCROLL,
+            {
+                "direction": "up" if direction == 1 else "down",
+                "amount": scroll_amount,
+                "total_scroll": total_scroll,
+                "average_speed": total_scroll / duration if duration > 0 else 0
+            },
+            duration
+        )
+    
+    def emulate_idle(self):
+        
+        start_time = time.time()
+        idle_time = random.randint(30, 180)
+        
+        self.logger.info(f"Прошло времени: {idle_time} секунд")
+        
+        
+        for second in range(idle_time):
+            if not self.running:
+                return
+            
+            
+            if second % 30 == 0:
+                
+                idle_progress = second / idle_time * 100
+                if idle_progress > 50:
+                    
+                    remaining = idle_time - second
+                    self.logger.debug(f"Осталось {remaining} секунд")
+            
+            time.sleep(1)
+        
+        duration = time.time() - start_time
+        
+        self._log_activity(
+            ActivityType.IDLE,
+            {"duration_seconds": idle_time, "actual_duration": duration},
+            duration
+        )
+    
+    def select_random_activity(self):
+        
+        activities = list(Config.ACTIVITY_CHANCES.keys())
+        probabilities = list(Config.ACTIVITY_CHANCES.values())
+        
+        
+        noisy_probabilities = [p * random.uniform(0.9, 1.1) for p in probabilities]
+        
+        
+        total = sum(noisy_probabilities)
+        if total > 0:
+            normalized = [p / total for p in noisy_probabilities]
+        else:
+            normalized = probabilities
+        
+        return random.choices(activities, weights=normalized, k=1)[0]
+    
+    def execute_activity(self, activity_name: str):
+        
+        
+        if activity_name not in Config.ACTIVITY_CHANCES:
+            self.logger.warning(f"Неизвестный скрипт: {activity_name}")
+            
+            activity_name = random.choice(list(Config.ACTIVITY_CHANCES.keys()))
+        
+        try:
+            if activity_name == 'mouse_move':
+                self.emulate_mouse_move()
+            elif activity_name == 'mouse_click':
+                self.emulate_mouse_click()
+            elif activity_name == 'keyboard_type':
+                self.emulate_keyboard_typing()
+            elif activity_name == 'app_switch':
+                self.emulate_app_switch()
+            elif activity_name == 'scroll':
+                self.emulate_scroll()
+        except Exception as e:
+            self.logger.error(f"Ошибка при выполнении скрипта {activity_name}: {e}")
+            
+            
+            error_data = {
+                "timestamp": datetime.now().isoformat(),
+                "activity": activity_name,
+                "error": str(e),
+                "mouse_position": self.mouse_controller.position
+            }
+            
+            
+            try:
+                with open("activity_errors.log", "a") as f:
+                    json.dump(error_data, f)
+                    f.write("\n")
+            except:
+                pass
+    
+    def is_working_hours(self):
+        
+        now = datetime.now()
+        current_hour = now.hour
+        
+        
+        day_of_week = now.weekday()
+        is_weekend = day_of_week >= 5  
+        
+        if is_weekend:
+            self.logger.debug("")
+            return False
+        
+        
+        if current_hour < Config.WORK_START_HOUR or current_hour >= Config.WORK_END_HOUR:
+            return False
+        
+        
+        if Config.LUNCH_START_HOUR <= current_hour < Config.LUNCH_START_HOUR + Config.LUNCH_DURATION_MINUTES // 60:
+            return False
+        
+        return True
+    
+    def run_workday_simulation(self, hours: int = 8):
+        """Запуск скрипта"""
+        self.running = True
+        self.start_time = datetime.now()
+        end_time = self.start_time + timedelta(hours=hours)
+        
+        self.logger.info(f"Скрипт запущен. Продолжительность: {hours} часов")
+        self.logger.info(f"Скрипт завершится в: {end_time.strftime('%H:%M:%S')}")
+        
+        
+        self._initialize_simulation_stats()
+        
+        
+        hotkey_thread = threading.Thread(target=self._hotkey_listener, daemon=True)
+        hotkey_thread.start()
+        
+        try:
+            while self.running and datetime.now() < end_time:
+                if self.paused:
+                    time.sleep(1)
+                    
+                    
+                    self._update_pause_stats()
+                    continue
+                
+                
+#                if not self.is_working_hours():
+#                    wait_time = 300  # 5 минут
+#                    self.logger.info(f"Вне диапазона времени. Пауза {wait_time} секунд")
+#                    time.sleep(wait_time)
+#                    continue
+                
+                
+                activity = self.select_random_activity()
+                self.execute_activity(activity)
+                
+                
+                if self.running and not self.paused:
+                    wait_time = random.randint(
+                        Config.MIN_ACTIVITY_INTERVAL,
+                        Config.MAX_ACTIVITY_INTERVAL
+                    )
+                    time.sleep(wait_time)
+        
+        except KeyboardInterrupt:
+            self.logger.info("Скрипт прерван пользователем")
+        except Exception as e:
+            self.logger.error(f"Непредвиденная ошибка: {e}")
+        finally:
+            self.running = False
+            self._print_statistics()
+            self._cleanup_resources()
+    
+    def _initialize_simulation_stats(self):
+        
+        self._simulation_stats = {
+            "start_time": self.start_time,
+            "activities_performed": 0,
+            "total_duration": 0,
+            "pauses": 0,
+            "errors": 0
+        }
+        
+        
+        for activity in Config.ACTIVITY_CHANCES.keys():
+            self._simulation_stats[f"{activity}_count"] = 0
+            self._simulation_stats[f"{activity}_total_time"] = 0
+    
+    def _update_pause_stats(self):
+        """Обновление """
+        self._simulation_stats["pauses"] += 1
+        
+        
+        if self._simulation_stats["pauses"] % 10 == 0:
+            self.logger.debug(f"Количество пауз: {self._simulation_stats['pauses']}")
+    
+    def _hotkey_listener(self):
+        
+        def on_press(key):
+            try:
+                if key == Key.print_screen:
+                    self.paused = not self.paused
+                    status = "приостановлен" if self.paused else "возобновлен"
+                    self.logger.info(f"Скрипт {status}")
+                    
+                    
+                    GLOBAL_CACHE["last_status_change"] = {
+                        "time": time.time(),
+                        "status": status
+                    }
+                elif key == Key.f11:
+                    self.running = False
+                    self.logger.info("Завершение скрипта по запросу ")
+                    
+                    
+                    GLOBAL_CACHE["stopped_by_user"] = True
+                    GLOBAL_CACHE["stop_time"] = datetime.now().isoformat()
+                    return False
+            except Exception as e:
+                
+                self.logger.debug(f"Ошибка обработки: {e}")
+        
+        with keyboard.Listener(on_press=on_press) as listener:
+            listener.join()
+    
+    def _print_statistics(self):
+        
+        total_activities = sum(self.stats.values())
+        total_duration = (datetime.now() - self.start_time).total_seconds() if self.start_time else 0
+        
+        
+        hours = total_duration / 3600
+        minutes = (total_duration % 3600) / 60
+        seconds = total_duration % 60
+        
+        self.logger.info("=" * 50)
+        self.logger.info("СТАТИСТИКА СКРИПТА")
+        self.logger.info("=" * 50)
+        self.logger.info(f"Общая продолжительность: {hours:.2f} часов")
+        self.logger.info(f"Всего : {total_activities}")
+        
+        for activity_type, count in self.stats.items():
+            percentage = (count / total_activities * 100) if total_activities > 0 else 0
+            self.logger.info(f"{activity_type.value}: {count} ({percentage:.1f}%)")
+        
+        
+        self._print_extended_statistics()
+        
+        self.logger.info("=" * 50)
+        
+        
+        log_filename = f"detailed_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        try:
+            with open(log_filename, 'w', encoding='utf-8') as f:
+                f.write("timestamp,activity_type,details,duration\n")
+                for record in self.activities_log:
+                    f.write(f"{record.timestamp},{record.activity_type.value},{record.details},{record.duration}\n")
+            self.logger.info(f"Детальный лог сохранен в: {log_filename}")
+        except Exception as e:
+            self.logger.error(f"Ошибка при сохранении лога: {e}")
+    
+    def _print_extended_statistics(self):
+        
+        
+        if self.activities_log:
+            durations = [record.duration for record in self.activities_log]
+            avg_duration = sum(durations) / len(durations)
+            max_duration = max(durations)
+            min_duration = min(durations)
+            
+            self.logger.info(f"Средняя длительность : {avg_duration:.2f} сек")
+            self.logger.info(f"Максимальная длительность: {max_duration:.2f} сек")
+            self.logger.info(f"Минимальная длительность: {min_duration:.2f} сек")
+            
+            
+            sorted_durations = sorted(durations)
+            n = len(sorted_durations)
+            if n % 2 == 0:
+                median = (sorted_durations[n//2 - 1] + sorted_durations[n//2]) / 2
+            else:
+                median = sorted_durations[n//2]
+            
+            self.logger.info(f"Медианная длительность: {median:.2f} сек")
+    
+    def _cleanup_resources(self):
+        
+        
+        self._unused_list.clear()
+        self._unused_dict.clear()
+        
+        
+        if GLOBAL_CACHE:
+            cache_filename = f"global_cache_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            try:
+                with open(cache_filename, 'w') as f:
+                    json.dump(GLOBAL_CACHE, f)
+                self.logger.debug(f"Глобальный кэш сохранен в {cache_filename}")
+            except:
+                pass
+        
+        
+        self.logger.info("Ресурсы очищены")
+
+# ==================== ТОЧКА ВХОДА ====================
+def signal_handler(signum, frame):
+    """Обработчик сигналов для graceful shutdown"""
+    print("\nПолучен сигнал завершения")
+    
+    
+    exit_code = 0
+    if signum == signal.SIGINT:
+        print("Получен SIGINT (Ctrl+C)")
+        exit_code = 130
+    elif signum == signal.SIGTERM:
+        print("Получен SIGTERM")
+        exit_code = 143
+    
+    
+    termination_info = {
+        "signal": signum,
+        "time": datetime.now().isoformat(),
+        "exit_code": exit_code
+    }
+    
+    try:
+        with open("termination_info.json", "w") as f:
+            json.dump(termination_info, f)
+    except:
+        pass
+    
+    sys.exit(exit_code)
+
+
+def validate_configuration(config_dict: dict) -> Tuple[bool, List[str]]:
+    """Валидация конфигурации ()"""
+    errors = []
+    required_keys = ["WORK_START_HOUR", "WORK_END_HOUR"]
+    
+    for key in required_keys:
+        if key not in config_dict:
+            errors.append(f"Отсутствует обязательный ключ: {key}")
+    
+    
+    if "WORK_START_HOUR" in config_dict and "WORK_END_HOUR" in config_dict:
+        if config_dict["WORK_START_HOUR"] >= config_dict["WORK_END_HOUR"]:
+            errors.append("Время начала должно быть раньше времени окончания")
+    
+    return len(errors) == 0, errors
+
+def unused_data_processor(data_list: List[Any]) -> Dict[str, Any]:
+    """Обработчик данных ()"""
+    result = {
+        "count": len(data_list),
+        "sum": 0,
+        "average": 0,
+        "types": {}
+    }
+    
+    for item in data_list:
+        
+        item_type = type(item).__name__
+        if item_type not in result["types"]:
+            result["types"][item_type] = 0
+        result["types"][item_type] += 1
+        
+        try:
+            numeric_value = float(item)
+            result["sum"] += numeric_value
+        except (ValueError, TypeError):
+            pass
+    
+    if result["count"] > 0:
+        result["average"] = result["sum"] / result["count"]
+    
+    return result
+
+def main():
+    """Основная функция"""
+    
+    welcome_message = """HELLO"""
+    print(welcome_message)
+    
+    print("=" * 60)
+    print("СТАРТ СКРИПТА")
+    print("=" * 60)
+    print("Горячие клавиши:")
+    print("  F12 - Пауза/Продолжить")
+    print("  F11 - Остановить")
+    print("  Ctrl+C - Выход")
+    print("=" * 60)
+    
+    
+    system_check_passed = True
+    try:
+        import platform
+        system_info = platform.uname()
+        print(f"Система: {system_info.system} {system_info.release}")
+    except:
+        system_check_passed = False
+        print("Не удалось определить информацию о системе")
+    
+    # Обработка сигналов
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    
+    emulator = ActivityEmulator()
+    
+    
+    try:
+        config_override = {}
+        use_default = input("Использовать настройки по умолчанию? (y/n): ").lower()
+        if use_default != 'y':
+             
+            hours = input("в часах (по умолчанию 8): ")
+            if hours:
+                config_override["hours"] = int(hours)
+            
+            activity_level = input("Уровень (low/medium/high): ")
+            if activity_level in ["low", "medium", "high"]:
+                config_override["activity_level"] = activity_level
+    except:
+        pass
+    
+    
+    try:
+        hours = int(input("\nв часах (по умолчанию 8): ") or "8")
+        if hours <= 0:
+            hours = 8
+    except ValueError:
+        hours = 8
+    
+    
+    if hours > 24:
+        print("Предупреждение: 24")
+        confirm = input("Продолжить? (y/n): ")
+        if confirm.lower() != 'y':
+            hours = 8
+    
+    print(f"\nССкрипт начнется через 5 секунд...")
+    print("Переключитесь в приложение\n")
+    
+    
+    for i in range(5, 0, -1):
+        print(f"Старт через {i}...")
+        time.sleep(1)
+    
+    
+    try:
+        emulator.run_workday_simulation(hours=hours)
+    except Exception as e:
+        emulator.logger.error(f"Критическая ошибка: {e}")
+        
+        
+        error_report = {
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e),
+            "traceback": str(sys.exc_info())
+        }
+        
+        try:
+            with open("critical_error.json", "w") as f:
+                json.dump(error_report, f)
+        except:
+            pass
+        
+        sys.exit(1)
+
+if __name__ == "__main__":
+    
+    missing_deps = []
+    try:
+        from pynput import mouse, keyboard
+    except ImportError:
+        missing_deps.append("pynput")
+    
+    try:
+        from screeninfo import get_monitors
+    except ImportError:
+        missing_deps.append("screeninfo")
+    
+    if missing_deps:
+        print("Ошибка: Отсутствуют необходимые библиотеки:")
+        for dep in missing_deps:
+            print(f"  - {dep}")
+        
+        
+        print("\nУстановите их с помощью:")
+        if "pynput" in missing_deps:
+            print("  pip install pynput")
+        if "screeninfo" in missing_deps:
+            print("  pip install screeninfo")
+        
+        
+        try:
+            import subprocess
+            import sys
+            
+            if sys.platform == "win32":
+                print("\nДля Windows также может потребоваться установить:")
+                print("  Microsoft Visual C++ Redistributable")
+        except:
+            pass
+        
+        sys.exit(1)
+    
+    
+    GLOBAL_CACHE["program_start_time"] = time.time()
+    GLOBAL_CACHE["python_version"] = sys.version
+    
+    
+    main()
+    
+    
+    print("\n" + "=" * 60)
+    print("Программа завершена. Спасибо за использование!")
+    print("=" * 60)
