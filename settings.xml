@@ -1,0 +1,12 @@
+<settings>
+  <!-- ... другие настройки, например, профили ... -->
+  <servers>
+    <!-- id должен совпадать с id из секции <repository> в pom.xml -->
+    <server>
+      <id>my-internal-nexus</id>
+      <username>ваш_логин</username>
+      <password>ваш_пароль</password>
+    </server>
+  </servers>
+  <!-- ... -->
+</settings>
