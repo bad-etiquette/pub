@@ -1,0 +1,17 @@
+package com.example;
+
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Приложение, использующее библиотеку из внутреннего Nexus-репозитория.
+ */
+public class App {
+    public static void main(String[] args) {
+        String message = "Привет из Nexus!";
+        String reversedMessage = StringUtils.reverse(message);
+
+        System.out.println("Оригинал: " + message);
+        System.out.println("Развернуто: " + reversedMessage);
+        System.out.println("Библиотека commons-lang3 успешно загружена из репозитория!");
+    }
+}
